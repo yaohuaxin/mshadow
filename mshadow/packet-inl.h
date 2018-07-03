@@ -23,10 +23,13 @@ namespace packet {
 enum PacketArch {
   kPlain,
   kSSE2,
+  kALTIVEC,
 };
 
 #if MSHADOW_USE_SSE
 #define MSHADOW_DEFAULT_PACKET  ::mshadow::packet::kSSE2
+#elif MSHADOW_USE_ALTIVEC
+#define MSHADOW_DEFAULT_PACKET  ::mshadow::packet::kALTIVEC
 #else
 #define MSHADOW_DEFAULT_PACKET  ::mshadow::packet::kPlain
 #endif
@@ -201,6 +204,8 @@ struct Saver<sv::saveto, TFloat, Arch> {
 #include "packet/plain-inl.h"
 #if MSHADOW_USE_SSE && !defined(__CUDACC__)
 #include "packet/sse-inl.h"
+#elif MSHADOW_USE_ALTIVEC && !defined(__CUDACC__)
+#include "packet/altivec-inl.h"
 #endif
 
 namespace mshadow {

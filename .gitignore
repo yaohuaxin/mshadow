@@ -19,3 +19,7 @@ dmlc-core
 *.db
 *.bak
 build
+
+#eclipse files
+.cproject
+.project

@@ -21,14 +21,13 @@ else
   ATLAS_LDFLAGS := -lcblas
 endif
 
-ifndef USE_SSE
-	USE_SSE=1
-endif
-
+# TODO how to use SSE/ALTIVEC by default?
 ifeq ($(USE_SSE), 1)
-	MSHADOW_CFLAGS += -msse3
+	MSHADOW_CFLAGS += -msse3 -DMSHADOW_USE_SSE=1
+else ifeq ($(USE_ALTIVEC), 1)
+	MSHADOW_CFLAGS += -mcpu=powerpc64le -mtune=powerpc64le -DMSHADOW_USE_ALTIVEC=1
 else
-	MSHADOW_CFLAGS += -DMSHADOW_USE_SSE=0
+	MSHADOW_CFLAGS += -DMSHADOW_USE_SSE=0 -DMSHADOW_USE_ALTIVEC=0 
 endif
 
 # whether to use F16C instruction set extension for fast fp16 compute on CPU

@@ -130,9 +130,17 @@ typedef unsigned __int64 uint64_t;
   #endif
 #endif
 
-/*! \brief whether use SSE */
+/*! \brief whether use SSE/ALTIVEC */
 #ifndef MSHADOW_USE_SSE
-  #define MSHADOW_USE_SSE 1
+  #ifdef __x86_64__
+    #define MSHADOW_USE_SSE 1
+  #endif
+#endif
+
+#ifndef MSHADOW_USE_ALTIVEC
+  #ifdef __PPC64__
+    #define MSHADOW_USE_ALTIVEC 1
+  #endif
 #endif
 
 /*! \brief whether use F16C instruction set architecture extension */
@@ -151,10 +159,13 @@ typedef unsigned __int64 uint64_t;
 #ifndef MSHADOW_USE_NVML
   #define MSHADOW_USE_NVML 0
 #endif
-// SSE is conflict with cudacc
+// SSE/ALTIVEC is conflict with cudacc
 #ifdef __CUDACC__
   #undef MSHADOW_USE_SSE
   #define MSHADOW_USE_SSE 0
+
+  #undef MSHADOW_USE_ALTIVEC
+  #define MSHADOW_USE_ALTIVEC 0
 #endif
 
 #if MSHADOW_USE_CBLAS
