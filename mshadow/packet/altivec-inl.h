@@ -14,6 +14,8 @@
 #include "../base.h"
 #include "../packet-inl.h"
 
+#define DEBUG__
+
 namespace mshadow {
 namespace packet {
 template<>
@@ -26,36 +28,52 @@ struct Packet<float, kALTIVEC> {
   // enable default copy constructor
   Packet(void) {}
   // constructor from the intrinsic type
-  explicit Packet(__vector float data) : data_(data) {}
+  explicit Packet(__vector float data) : data_(data) {
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
+  }
   // create a fill with the target value s
   MSHADOW_CINLINE static Packet<float, kALTIVEC> Fill(float s) {
-	  printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     return Packet<float, kALTIVEC>(vec_splats(s));
   }
   // load from address
   MSHADOW_CINLINE static Packet<float, kALTIVEC> Load(const float* src) {
-	  printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     return Packet<float, kALTIVEC>(vec_vsx_ld(0, src));
   }
   // load from address
   MSHADOW_CINLINE static Packet<float, kALTIVEC> LoadUnAligned(const float* src) {
-	  printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     return Packet<float, kALTIVEC>(vec_vsx_ld(0, src));
   }
   // fill it with value s
   MSHADOW_CINLINE Packet<float, kALTIVEC>& operator=(float s) {
-	  printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     data_ = vec_splats(s);
     return *this;
   }
   // store data into dst
   MSHADOW_CINLINE void Store(float* dst) const {
-	  printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     vec_vsx_st(data_, 0, dst);
   }
   // get the sum of all contents
   MSHADOW_CINLINE float Sum() const {
-	  printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     __vector float ans = vec_add(data_, vec_sld(data_, data_, 12));
     ans = vec_add(ans, vec_sld(ans, ans, 8));
     return vec_extract(ans, 0);
@@ -71,93 +89,129 @@ struct Packet<double, kALTIVEC> {
   __vector double data_;
   // constructor
   Packet(void) {}
-  explicit Packet(__vector double data) : data_(data) {}
+  explicit Packet(__vector double data) : data_(data) {
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
+  }
   // create a fill with the target value s
   MSHADOW_CINLINE static Packet<double, kALTIVEC> Fill(double s) {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     return Packet<double, kALTIVEC>(vec_splats(s));
   }
   // load from address
   MSHADOW_CINLINE static Packet<double, kALTIVEC> Load(const double* src) {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     return Packet<double, kALTIVEC>(vec_vsx_ld(0, src));
   }
   MSHADOW_CINLINE static Packet<double, kALTIVEC> LoadUnAligned(const double* src) {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     return Packet<double, kALTIVEC>(vec_vsx_ld(0, src));
   }
   // fill it with value s
   MSHADOW_CINLINE Packet<double, kALTIVEC>& operator=(double s) {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     data_ = vec_splats(s);
     return *this;
   }
   // store data into dst
   MSHADOW_CINLINE void Store(double* dst) const {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
     vec_vsx_st(data_, 0, dst);
   }
   // get sum of all content
   inline double Sum(void) const {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
-	__vector double ans = vec_add(data_, vec_sld(data_, data_, 8));
-/*
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
 #if defined(__GNUG__) && !defined(__clang__)
+#if __GNUC__>7 || __GNUC__==7
     __vector double ans = vec_add(data_, vec_sld(data_, data_, 8));
+    return vec_extract(ans, 0);
+#else
+    printf("Error: %s::%4d::%s. Not implement yet\n", __FILE__, __LINE__, __FUNCTION__);
+    return 0.0;
+#endif
 #else
     vector double ans = vec_add(data_, vec_sldw(data_, data_, 2));
-#endif
-*/
     return vec_extract(ans, 0);
+#endif
+
   }
 };
 
 MSHADOW_CINLINE Packet<float, kALTIVEC> operator+(const Packet<float, kALTIVEC>& lhs,
                                                     const Packet<float, kALTIVEC>& rhs) {
-  printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
   return Packet<float, kALTIVEC>(vec_add(lhs.data_, rhs.data_));
 }
 
 MSHADOW_CINLINE Packet<double, kALTIVEC> operator+(const Packet<double, kALTIVEC>& lhs,
                                                      const Packet<double, kALTIVEC>& rhs) {
-  printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
   return Packet<double, kALTIVEC>(vec_add(lhs.data_, rhs.data_));
 }
 
 MSHADOW_CINLINE Packet<float, kALTIVEC> operator-(const Packet<float, kALTIVEC>& lhs,
                                                     const Packet<float, kALTIVEC>& rhs) {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
   return Packet<float, kALTIVEC>(vec_sub(lhs.data_, rhs.data_));
 }
 
 MSHADOW_CINLINE Packet<double, kALTIVEC> operator-(const Packet<double, kALTIVEC>& lhs,
                                                      const Packet<double, kALTIVEC>& rhs) {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
   return Packet<double, kALTIVEC>(vec_sub(lhs.data_, rhs.data_));
 }
 
 MSHADOW_CINLINE Packet<float, kALTIVEC> operator*(const Packet<float, kALTIVEC>& lhs,
                                                     const Packet<float, kALTIVEC>& rhs) {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
   return Packet<float, kALTIVEC>(vec_mul(lhs.data_, rhs.data_));
 }
 
 MSHADOW_CINLINE Packet<double, kALTIVEC> operator*(const Packet<double, kALTIVEC>& lhs,
                                                      const Packet<double, kALTIVEC>& rhs) {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
   return Packet<double, kALTIVEC>(vec_mul(lhs.data_, rhs.data_));
 }
 
 
 MSHADOW_CINLINE Packet<float, kALTIVEC> operator/(const Packet<float, kALTIVEC>& lhs,
                                                     const Packet<float, kALTIVEC>& rhs) {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
   return Packet<float, kALTIVEC>(vec_div(lhs.data_, rhs.data_));
 }
 
 MSHADOW_CINLINE Packet<double, kALTIVEC> operator/(const Packet<double, kALTIVEC>& lhs,
                                                      const Packet<double, kALTIVEC>& rhs) {
-	printf("Huaxin debug: %s.\n", __FUNCTION__);
+#ifdef DEBUG__
+	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
+#endif
   return Packet<double, kALTIVEC>(vec_div(lhs.data_, rhs.data_));
 }
 
