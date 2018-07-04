@@ -135,18 +135,16 @@ struct Packet<double, kALTIVEC> {
 	  printf("Huaxin debug: %s::%4d::%s.\n", __FILE__, __LINE__, __FUNCTION__);
 #endif
 #if defined(__GNUG__) && !defined(__clang__)
-#if __GNUC__>7 || __GNUC__==7
-    __vector double ans = vec_add(data_, vec_sld(data_, data_, 8));
-    return vec_extract(ans, 0);
-#else
-    printf("Error: %s::%4d::%s. Not implement yet\n", __FILE__, __LINE__, __FUNCTION__);
-    return 0.0;
-#endif
+	#if __GNUC__ < 7
+		__vector double ans =
+				vec_add(data_, (__vector double)vec_sld((__vector float)data_, (__vector float)data_, 8));
+	#else
+		__vector double ans = vec_add(data_, vec_sld(data_, data_, 8));
+	#endif
 #else
     vector double ans = vec_add(data_, vec_sldw(data_, data_, 2));
-    return vec_extract(ans, 0);
 #endif
-
+    return vec_extract(ans, 0);
   }
 };
 
