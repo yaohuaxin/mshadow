@@ -14,8 +14,6 @@
 #include "../base.h"
 #include "../packet-inl.h"
 
-#define DEBUG__
-
 namespace mshadow {
 namespace packet {
 template<>
